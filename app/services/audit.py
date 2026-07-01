@@ -1,3 +1,5 @@
+"""사용자 행동과 시스템 이벤트를 MongoDB audit 컬렉션에 기록하는 서비스."""
+
 from datetime import datetime, timezone
 from app.database.mongo import get_mongo_db
 

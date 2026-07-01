@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from app.services import graph_service
 from app.services.graph_rag import graph_rag_search, graph_rag_answer
 
+# Neo4j 기반 기업/섹터 관계 그래프 조회 API입니다.
+# RAG 답변에 그래프 컨텍스트를 더하기 위한 탐색 엔드포인트를 제공합니다.
 router = APIRouter(prefix="/api/graph", tags=["graph"])
 
 

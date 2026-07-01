@@ -1,7 +1,10 @@
+"""관리자 전용 기능을 제공하는 API 라우터."""
+
 from fastapi import APIRouter, Depends, HTTPException
 from app.database.mongo import get_mdb
 from app.lib.session import get_current_user
 
+# 관리자 권한이 필요한 진단/관리 작업을 이 prefix 아래에 모읍니다.
 router = APIRouter(prefix="/api/admin")
 
 FINANCIAL_COLS = ["personal_cb_stats", "corporate_cb_stats", "bank_products", "fund_products"]

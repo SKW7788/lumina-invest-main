@@ -32,6 +32,8 @@ from app.lib.user_state import (
     set_active_conversation,
 )
 
+# 대화 스레드 단위로 메시지와 상태를 관리하는 라우터입니다.
+# 여러 세션에 걸친 사용자의 대화 맥락을 MongoDB에 구조화해 저장합니다.
 router = APIRouter(prefix="/api/conversations", tags=["conversations"])
 
 

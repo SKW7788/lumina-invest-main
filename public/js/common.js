@@ -1,4 +1,8 @@
+// 정적 HTML 화면들이 공통으로 사용하는 브라우저 유틸리티 모듈입니다.
+// API 호출, 토스트 메시지, 숫자/퍼센트 포맷, HTML escaping을 한곳에 모읍니다.
+
 export async function api(path, { method = "GET", body, headers = {} } = {}) {
+  // FastAPI 백엔드는 HTTP-only 쿠키 세션도 사용하므로 credentials: "include"를 유지합니다.
   let res;
   try {
     res = await fetch(path, {
@@ -30,10 +34,13 @@ export async function api(path, { method = "GET", body, headers = {} } = {}) {
 }
 
 export async function getMe() {
+  // 현재 로그인 사용자를 확인하는 공통 헬퍼입니다.
   return api("/api/me");
 }
 
 export function setToast(msg, type = "ok") {
+  // 기존 toast를 제거하고 새 toast를 만듭니다.
+  // Tailwind CDN 환경에서는 @apply 전처리가 없으므로 인라인 스타일을 사용합니다.
   // 기존 toast 제거 후 새로 만들기 (CDN Tailwind @apply 파싱 문제 우회)
   const existing = document.getElementById("_toast_el");
   if (existing) existing.remove();
@@ -81,6 +88,7 @@ export function setToast(msg, type = "ok") {
 }
 
 export function escHtml(s) {
+  // 사용자 입력이나 외부 API 문자열을 HTML에 직접 넣을 때 XSS를 막기 위한 escape 함수입니다.
   return String(s ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -90,6 +98,7 @@ export function escHtml(s) {
 }
 
 export function fmt(n, digits = 0) {
+  // 숫자 문자열과 숫자 타입을 모두 한국어 로케일 표시 형식으로 변환합니다.
   if (n == null || n === "") return "-";
   const num = parseFloat(n);
   if (isNaN(num)) return String(n);
@@ -100,6 +109,7 @@ export function fmt(n, digits = 0) {
 }
 
 export function fmtPct(n) {
+  // 등락률 표시용 퍼센트 formatter입니다.
   if (n == null) return "-";
   const v = parseFloat(n);
   if (isNaN(v)) return "-";
@@ -108,6 +118,7 @@ export function fmtPct(n) {
 }
 
 export function colorPct(n) {
+  // 양수/음수 등락률에 맞는 Tailwind 색상 클래스를 반환합니다.
   if (n == null) return "";
   return parseFloat(n) >= 0 ? "text-emerald-400" : "text-red-400";
 }

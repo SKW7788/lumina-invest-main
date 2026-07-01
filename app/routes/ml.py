@@ -12,6 +12,8 @@ from app.services.ml_models import (
     regression_forecast,
 )
 
+# 머신러닝 모델 비교, 클러스터링, 계절성/상관 분석 API를 제공합니다.
+# 프런트엔드의 실험형 분석 화면에서 사용하는 계산 중심 라우터입니다.
 router = APIRouter(prefix="/api/ml")
 
 

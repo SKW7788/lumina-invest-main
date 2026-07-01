@@ -15,6 +15,7 @@ def get_broker_client(
     app_secret: str = "",
     paper: bool = True,
 ) -> BrokerClient:
+    """브로커 코드와 인증 설정을 기반으로 적절한 증권사 클라이언트를 생성합니다."""
     """
     broker: "kis" | "kiwoom" | "daishin" | "meritz" | "shinhan" | "ebest" | "mock"
     key/secret이 없으면 자동으로 MockBrokerClient 반환.

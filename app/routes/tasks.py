@@ -10,6 +10,8 @@ from celery.result import AsyncResult
 
 from app.celery_app import celery_app
 
+# Celery task_id 기반으로 비동기 작업 상태와 결과를 조회하는 라우터입니다.
+# 채팅/ingest 등 오래 걸리는 작업의 polling 엔드포인트로 사용됩니다.
 router = APIRouter(prefix="/api")
 
 _STATE_MAP = {

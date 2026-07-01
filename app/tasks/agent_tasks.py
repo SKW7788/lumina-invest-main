@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def _now() -> str:
+    """Celery task 로그에 사용할 UTC ISO 타임스탬프를 생성합니다."""
     return datetime.now(timezone.utc).isoformat()
 
 
@@ -33,6 +34,7 @@ def run_agent_task(
     llm_model: str,
     rag_context: str = "",
 ) -> dict:
+    """LangGraph 기반 AI Agent를 백그라운드에서 실행하는 Celery task입니다."""
     """LangGraph ReAct 에이전트를 워커에서 실행하고 채팅 기록을 MongoDB에 저장한다."""
 
     async def _async() -> dict:

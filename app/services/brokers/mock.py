@@ -20,6 +20,7 @@ _PRICES = {
 
 
 class MockBrokerClient(BrokerClient):
+    """실제 증권사 연동 없이 개발/테스트 화면을 검증하기 위한 Mock 클라이언트입니다."""
     """API 키 없이 Mockup 데이터 반환 – 개발/데모 전용."""
 
     async def get_token(self) -> TokenInfo:

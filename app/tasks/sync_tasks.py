@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 @celery_app.task(name="sync.market_data", time_limit=300)
 def sync_market_data() -> dict:
+    """시장 지수, 거시 지표, 섹터 ETF, 미국 주요 종목 데이터를 동기화합니다."""
     """시장 지수·매크로·섹터 ETF·미국 주식 데이터를 캐싱한다 (1시간 주기)."""
 
     async def _async() -> dict:
@@ -38,6 +39,7 @@ def sync_market_data() -> dict:
 
 @celery_app.task(name="sync.stock_candles", time_limit=600)
 def sync_stock_candles() -> dict:
+    """관심 종목의 일봉 캔들 데이터를 주기적으로 동기화합니다."""
     """주요 종목 캔들 데이터와 퀀트 지표를 일 1회 캐싱한다."""
 
     async def _async() -> dict:

@@ -5,6 +5,8 @@ from app.lib.session import get_current_user
 from app.services.stock import get_candles, QUANT_STOCKS
 from app.services.quant_pipeline import run_pipeline
 
+# 퀀트 ML 파이프라인 실행과 결과 조회를 담당하는 라우터입니다.
+# OHLCV 전처리, 모델 학습, 백테스트는 services.quant_pipeline에 위임합니다.
 router = APIRouter(prefix="/api/quant/ml")
 
 

@@ -1,3 +1,9 @@
+"""MongoDB 연결과 인덱스 생성을 담당하는 데이터베이스 모듈.
+
+FastAPI lifespan에서 connect_mongo/close_mongo를 호출하고,
+라우터와 서비스에서는 get_mdb 또는 get_mongo_db로 DB 핸들을 재사용합니다.
+"""
+
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from app.config import settings
 

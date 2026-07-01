@@ -23,6 +23,8 @@ from app.lib.user_state import get_active_conversation, set_active_conversation
 from app.services.langgraph_agent import run_agent
 from app.services.rag_pipeline import rag_search
 
+# 채팅 라우터는 동기 응답과 Celery 기반 비동기 실행을 함께 제공합니다.
+# 긴 LLM 작업은 비동기 task로 넘겨 HTTP 요청 점유 시간을 줄입니다.
 router = APIRouter(prefix="/api")
 
 

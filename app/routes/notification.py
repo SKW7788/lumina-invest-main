@@ -13,6 +13,8 @@ from app.database.mongo import get_mdb
 from app.lib.session import get_current_user
 from app.services import notification
 
+# Telegram, Slack, Email, Kakao/SMS 알림 설정과 테스트 발송을 담당합니다.
+# 사용자별 알림 설정은 저장소에 보관하고 발송 로직은 services.notification에 위임합니다.
 router = APIRouter(prefix="/api/notification")
 
 _SUPPORTED_CHANNELS = {"telegram", "slack", "email", "kakao", "sms"}

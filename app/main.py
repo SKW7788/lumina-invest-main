@@ -14,6 +14,8 @@ from app.services.graph_service import seed_graph
 from app.services.sync_scheduler import start_sync_scheduler, stop_sync_scheduler
 
 
+# FastAPI 애플리케이션 조립 지점입니다.
+# lifespan에서 외부 저장소 연결을 준비하고, 아래에서 기능별 라우터와 정적 파일 서빙을 등록합니다.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 시작

@@ -25,6 +25,7 @@ CRAWL_TARGETS = [
 
 
 class _TextExtractor(HTMLParser):
+    """HTML 문서에서 script/style을 제외한 본문 텍스트만 추출하는 파서입니다."""
     def __init__(self):
         super().__init__()
         self._texts = []
@@ -279,6 +280,7 @@ async def crawl_naver_stock(
 
 
 async def run_auto_crawl(mdb, ollama: OllamaClient, log: list[str]) -> dict:
+    """미리 정의된 소스들을 순회하며 자동 크롤링 작업을 실행합니다."""
     """자동 크롤링 실행."""
     total_chunks = 0
     for target in CRAWL_TARGETS:
@@ -294,6 +296,7 @@ async def run_auto_crawl(mdb, ollama: OllamaClient, log: list[str]) -> dict:
 
 
 async def qdrant_search(query: str, ollama: OllamaClient, top_k: int = 5) -> list[dict]:
+    """질문을 임베딩한 뒤 Qdrant에서 관련 청크를 검색합니다."""
     """Qdrant 벡터 검색."""
     try:
         from qdrant_client import AsyncQdrantClient

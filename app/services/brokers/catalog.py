@@ -61,9 +61,10 @@ _BROKER_CATALOG = [
 
 
 def get_broker_catalog() -> list[dict]:
+    """프런트엔드에서 표시할 지원 증권사 목록을 반환합니다."""
     return deepcopy(_BROKER_CATALOG)
 
 
 def get_broker_codes() -> set[str]:
+    """설정 검증에 사용할 지원 증권사 코드 집합을 반환합니다."""
     return {b["code"] for b in _BROKER_CATALOG}
-

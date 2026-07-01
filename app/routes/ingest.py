@@ -1,3 +1,5 @@
+"""CSV/문서 데이터 적재와 백그라운드 ingest 작업을 제어하는 API 라우터."""
+
 import os
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends
@@ -13,6 +15,7 @@ from app.services.translation_ingest import (
     TRANSLATION_COLLECTION,
 )
 
+# 데이터 적재 요청을 HTTP에서 받되, 무거운 작업은 서비스 계층 또는 Celery로 분리합니다.
 router = APIRouter(prefix="/api")
 
 

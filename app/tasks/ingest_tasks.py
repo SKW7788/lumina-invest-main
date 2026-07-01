@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
     time_limit=600,
 )
 def financial_ingest_task(self) -> dict:
+    """CSV 금융 데이터를 MongoDB에 적재하는 Celery task입니다."""
     """CSV 금융 데이터(개인CB·기업CB·금융상품) 전체 인제스트."""
 
     async def _async() -> dict:
@@ -45,6 +46,7 @@ def financial_ingest_task(self) -> dict:
     time_limit=600,
 )
 def auto_crawl_task(self) -> dict:
+    """사전 정의된 외부 문서/금융 소스를 자동 크롤링하는 Celery task입니다."""
     """등록된 URL 목록 자동 크롤링 → Qdrant RAG 인제스트."""
 
     async def _async() -> dict:
@@ -79,6 +81,7 @@ def auto_crawl_task(self) -> dict:
     time_limit=120,
 )
 def url_crawl_task(self, url: str) -> dict:
+    """사용자가 지정한 단일 URL을 크롤링해 RAG 인덱스에 저장하는 Celery task입니다."""
     """단일 URL 크롤링 → Qdrant RAG 인제스트."""
 
     async def _async() -> dict:

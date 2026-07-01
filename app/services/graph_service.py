@@ -51,6 +51,7 @@ _RELATIONSHIPS: list[tuple[str, str, str]] = [
 # ── 그래프 초기화 ──────────────────────────────────────────────────────────────
 
 async def seed_graph() -> None:
+    """초기 기업/섹터 관계 그래프 데이터를 Neo4j에 적재합니다."""
     """Company·Sector 노드와 관계를 Neo4j에 삽입한다. 이미 존재하면 MERGE로 건너뛴다."""
     driver = get_neo4j()
     async with driver.session() as session:
@@ -94,6 +95,7 @@ async def seed_graph() -> None:
 # ── 쿼리 함수 ─────────────────────────────────────────────────────────────────
 
 async def get_related_stocks(symbol: str) -> dict:
+    """특정 종목과 같은 섹터, 경쟁사, 공급망 관계에 있는 종목을 조회합니다."""
     """한 종목의 경쟁사, 공급사, 수요처, 동일 섹터 종목을 반환한다."""
     driver = get_neo4j()
     async with driver.session() as session:
@@ -252,6 +254,7 @@ async def get_documents_for_symbol(symbol: str) -> list[dict]:
 
 
 def extract_mentioned_symbols(text: str) -> list[str]:
+    """문서나 답변 텍스트에서 알려진 종목 심볼을 추출합니다."""
     """텍스트에서 알려진 회사명을 매칭해 심볼 목록을 반환한다."""
     name_to_symbol = {c["name"]: c["symbol"] for c in _COMPANIES}
     found = []

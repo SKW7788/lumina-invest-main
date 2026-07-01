@@ -1,3 +1,5 @@
+"""주식 시세, 포트폴리오, 주문, 브로커 설정을 처리하는 API 라우터."""
+
 import json
 import logging
 import httpx
@@ -18,6 +20,7 @@ from app.services import notification
 from app.services.data_cache import cache_get, cache_set
 from app.services.sync_scheduler import KEY_MARKET_INDICES
 
+# 주식/포트폴리오/주문 API를 한 라우터에서 제공해 화면 단위 호출을 단순화합니다.
 router = APIRouter(prefix="/api")
 DEFAULT_BROKER = "mock"
 

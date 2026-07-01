@@ -24,6 +24,7 @@ except ImportError:
 # ── 1. 전처리 ─────────────────────────────────────────────────────────
 
 def preprocess(candles: list[dict]) -> pd.DataFrame:
+    """OHLCV 원천 데이터를 DataFrame으로 정리하고 결측/이상치를 제거합니다."""
     """원시 OHLCV → 정제된 DataFrame.
 
     - Unix timestamp → DatetimeIndex
@@ -51,6 +52,7 @@ FEATURE_COLS = [
 
 
 def feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
+    """수익률, 이동평균, RSI, MACD, 볼린저밴드 등 모델 입력 피처를 생성합니다."""
     """피처 엔지니어링: 수익률, 이동평균, RSI, MACD, 볼린저밴드, 거래량, ATR."""
     out = df.copy()
     c = out["close"].astype(float)
@@ -239,6 +241,7 @@ def rule_based_signals(df: pd.DataFrame) -> pd.Series:
 # ── 6. 백테스트 ───────────────────────────────────────────────────────
 
 def backtest(df: pd.DataFrame, signals: pd.Series) -> dict:
+    """생성된 매수/관망/매도 시그널을 과거 데이터에 적용해 성과 지표를 계산합니다."""
     """
     벡터화 백테스트: 롱 전략 (signal=+1 보유, 그 외 현금).
 

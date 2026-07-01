@@ -20,6 +20,7 @@ _PROBE_URL = "https://query2.finance.yahoo.com/v8/finance/chart/AAPL?range=1d&in
 
 
 async def is_internet_available() -> bool:
+    """외부 네트워크 접근 가능 여부를 빠르게 확인합니다."""
     """Return True if the external internet is reachable."""
     try:
         async with httpx.AsyncClient(timeout=4.0) as client:
@@ -30,6 +31,7 @@ async def is_internet_available() -> bool:
 
 
 async def cache_get(key: str, max_age_hours: float = 24) -> dict | None:
+    """지정한 max_age 안에 저장된 캐시 데이터를 조회합니다."""
     """Return cached payload if it exists and is fresher than max_age_hours.
 
     Returns None when the key is missing or stale.
@@ -54,6 +56,7 @@ async def cache_get(key: str, max_age_hours: float = 24) -> dict | None:
 
 
 async def cache_set(key: str, data) -> None:
+    """외부 API 응답을 MongoDB 캐시에 저장합니다."""
     """Upsert a cached payload."""
     try:
         db = get_mongo_db()
@@ -90,6 +93,7 @@ async def cache_info(key: str) -> dict | None:
 
 
 async def ensure_cache_index() -> None:
+    """캐시 조회 성능과 만료 관리를 위한 MongoDB 인덱스를 보장합니다."""
     """Create index on the cache collection (called at startup)."""
     try:
         db = get_mongo_db()

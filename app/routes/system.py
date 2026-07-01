@@ -5,6 +5,8 @@ from app.services.system_info import get_system_status
 from app.services import sync_scheduler
 from app.services.data_cache import cache_info, is_internet_available
 
+# 운영 화면에서 사용할 시스템 상태와 동기화 상태를 제공하는 라우터입니다.
+# 상세 수집 로직은 services.system_info와 sync_scheduler가 담당합니다.
 router = APIRouter(prefix="/api/system")
 
 

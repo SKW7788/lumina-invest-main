@@ -8,6 +8,8 @@ from app.services.sync_scheduler import (
     MACRO_SYMBOLS, SECTOR_ETFS, US_STOCKS,
 )
 
+# 거시경제 지표, 산업 분석, 재무 분석 데이터를 제공하는 라우터입니다.
+# 외부 시세 데이터와 캐시 계층을 함께 사용해 오프라인 상황을 완화합니다.
 router = APIRouter(prefix="/api/macro")
 
 

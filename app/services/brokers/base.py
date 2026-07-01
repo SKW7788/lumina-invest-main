@@ -6,6 +6,7 @@ from typing import Any
 
 @dataclass
 class TokenInfo:
+    """증권사 API 인증 토큰과 만료 시각을 담는 공통 DTO입니다."""
     access_token: str
     expires_in: int  # seconds
     token_type: str = "Bearer"
@@ -13,6 +14,7 @@ class TokenInfo:
 
 @dataclass
 class PriceInfo:
+    """종목 현재가 조회 결과를 표준화한 DTO입니다."""
     symbol: str
     name: str
     current: float
@@ -26,6 +28,7 @@ class PriceInfo:
 
 @dataclass
 class BalanceItem:
+    """계좌 잔고에 포함된 개별 종목 보유 정보를 표현합니다."""
     symbol: str
     name: str
     quantity: int
@@ -38,6 +41,7 @@ class BalanceItem:
 
 @dataclass
 class AccountBalance:
+    """현금과 보유 종목 목록을 포함한 계좌 잔고 응답 DTO입니다."""
     total_eval: float
     total_buy: float
     total_gain: float
@@ -46,6 +50,7 @@ class AccountBalance:
 
 
 class BrokerClient(ABC):
+    """모든 증권사 클라이언트가 구현해야 하는 공통 인터페이스입니다."""
     """모든 증권사 클라이언트의 공통 인터페이스."""
 
     @abstractmethod

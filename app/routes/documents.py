@@ -20,6 +20,8 @@ from app.services.doc_parser import parse_document, SUPPORTED_EXTENSIONS
 from app.services.rag_pipeline import store_chunks, rag_search, delete_chunks_by_source
 from app.config import settings
 
+# 문서 업로드, 파싱, Qdrant ingest 흐름을 담당합니다.
+# PDF/Office/텍스트 자료를 RAG 검색 대상으로 만들 때 이 라우터를 사용합니다.
 router = APIRouter(prefix="/api/documents", tags=["documents"])
 
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB

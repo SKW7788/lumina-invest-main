@@ -1,3 +1,9 @@
+"""Ollama API 호출을 감싸는 경량 클라이언트 모듈.
+
+채팅 모델, 임베딩 모델, 비전 언어 모델 호출을 서비스 계층에서 재사용할 수 있게
+공통 timeout과 URL 설정을 app.config 기반으로 관리합니다.
+"""
+
 import httpx
 import json
 from typing import Any

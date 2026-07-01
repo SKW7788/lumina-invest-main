@@ -18,6 +18,7 @@ _INITIAL_CAPITAL = 10_000_000
 
 
 def get_status() -> dict:
+    """자동매매 루프의 현재 실행 상태와 마지막 실행 결과를 반환합니다."""
     return {
         "running":      _is_running,
         "user_id":      _auto_trade_user_id,
@@ -27,6 +28,7 @@ def get_status() -> dict:
 
 
 def is_running() -> bool:
+    """자동매매 백그라운드 task가 실행 중인지 확인합니다."""
     """자동매매 루프 실행 상태만 반환."""
     return _is_running
 
@@ -144,6 +146,7 @@ async def _execute_virtual_trade(
 
 
 async def _run_quant_cycle(user_id: str = "quant_system") -> None:
+    """관심 종목별 퀀트 지표를 계산하고 조건에 맞으면 가상 주문을 실행합니다."""
     global _trade_log
     now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     cycle_log: dict = {"time": now_str, "trades": [], "signals": []}
@@ -316,6 +319,7 @@ async def _run_quant_cycle(user_id: str = "quant_system") -> None:
 
 
 async def _auto_trade_loop(user_id: str) -> None:
+    """자동매매가 켜져 있는 동안 주기적으로 퀀트 사이클을 실행하는 루프입니다."""
     global _is_running
     _is_running = True
     try:
@@ -329,6 +333,7 @@ async def _auto_trade_loop(user_id: str) -> None:
 
 
 def start_auto_trade(user_id: str = "quant_system") -> bool:
+    """자동매매 루프를 시작합니다. 이미 실행 중이면 False를 반환합니다."""
     global _auto_trade_task, _is_running, _auto_trade_user_id
     if _auto_trade_task and not _auto_trade_task.done():
         return False
@@ -339,6 +344,7 @@ def start_auto_trade(user_id: str = "quant_system") -> bool:
 
 
 def stop_auto_trade() -> bool:
+    """자동매매 루프 중단 플래그를 설정합니다."""
     global _auto_trade_task
     if _auto_trade_task and not _auto_trade_task.done():
         _auto_trade_task.cancel()

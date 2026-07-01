@@ -1,8 +1,11 @@
+"""금융상품 라이브러리 검색 API 라우터."""
+
 from fastapi import APIRouter, Depends, Query
 from app.database.mongo import get_mdb
 from app.lib.session import get_current_user
 from app.lib.financial_tools import search_bank_products, search_funds
 
+# 은행/펀드 상품 검색을 제공하며, 인증된 사용자의 라이브러리 화면에서 사용됩니다.
 router = APIRouter(prefix="/api")
 
 

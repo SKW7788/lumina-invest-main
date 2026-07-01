@@ -1,8 +1,16 @@
+"""애플리케이션 전역 설정 모듈.
+
+환경변수와 .env 파일을 Pydantic Settings로 읽어 서버, 인증, 데이터 저장소,
+LLM, 알림 채널 설정을 한곳에서 관리합니다.
+"""
+
 from pydantic_settings import BaseSettings
 import os
 
 
 class Settings(BaseSettings):
+    """Docker Compose와 로컬 실행 환경에서 공통으로 사용하는 설정 객체입니다."""
+
     PORT: int = 8000
     SESSION_SECRET: str = "change-me-super-secret"
     SESSION_TTL: int = 604800  # 7 days
@@ -76,6 +84,7 @@ class Settings(BaseSettings):
 
     @property
     def admin_email_list(self) -> list[str]:
+        """쉼표로 구분된 관리자 이메일 문자열을 리스트로 변환합니다."""
         return [e.strip() for e in self.ADMIN_EMAILS.split(",") if e.strip()]
 
 

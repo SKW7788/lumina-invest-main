@@ -44,6 +44,8 @@ from app.lib.session import (
 )
 from app.lib.user_state import clear_user_state, mark_offline, mark_online
 
+# 인증 라우터는 세션 쿠키 방식과 JWT Bearer 방식을 함께 제공합니다.
+# 기존 브라우저 UI와 API 클라이언트를 동시에 지원하기 위한 경계입니다.
 router = APIRouter(prefix="/api")
 
 

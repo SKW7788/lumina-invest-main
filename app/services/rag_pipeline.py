@@ -130,6 +130,7 @@ async def store_chunks(
 
 
 def build_rag_chain(collection: str | None = None):
+    """LangChain LCEL로 검색, 프롬프트 구성, LLM 응답 생성을 연결합니다."""
     """
     LCEL 기반 RAG 체인을 반환한다.
 
