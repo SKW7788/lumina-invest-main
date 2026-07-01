@@ -1,0 +1,92 @@
+pipeline {
+    agent any
+
+    options {
+        timestamps()
+        ansiColor('xterm')
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        PROJECT_NAME = 'lumina-invest-main'
+        COMPOSE_FILE = 'docker-compose.yml'
+        APP_URL = 'http://fin-ai-app:8000/api/health'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Verify Branch') {
+            steps {
+                sh '''
+                    echo "Current branch: ${BRANCH_NAME:-main}"
+                    git branch --show-current || true
+                '''
+            }
+        }
+
+        stage('Docker Compose Config') {
+            steps {
+                sh '''
+                    docker compose -f ${COMPOSE_FILE} config
+                '''
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh '''
+                    docker compose -f ${COMPOSE_FILE} build
+                '''
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                    docker compose -f ${COMPOSE_FILE} up -d
+                '''
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                sh '''
+                    for i in $(seq 1 30); do
+                      if curl -fsS ${APP_URL}; then
+                        echo "Health check success"
+                        exit 0
+                      fi
+
+                      echo "Waiting for app..."
+                      sleep 5
+                    done
+
+                    echo "Health check failed"
+                    docker compose -f ${COMPOSE_FILE} ps
+                    docker compose -f ${COMPOSE_FILE} logs --tail=100 fin-ai-app
+                    exit 1
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Lumina MAIN deployment succeeded.'
+        }
+
+        failure {
+            echo 'Lumina MAIN deployment failed.'
+        }
+
+        always {
+            cleanWs(deleteDirs: true, disableDeferredWipeout: true)
+        }
+    }
+}
