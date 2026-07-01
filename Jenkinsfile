@@ -37,6 +37,14 @@ pipeline {
             }
         }
 
+        stage('Docker Compose Down') {
+            steps {
+                sh '''
+                    docker compose -f docker-compose.yml down --remove-orphans || true
+                '''
+            }
+        }
+
         stage('docker compose build') {
             steps {
                 // 최신 베이스 이미지를 확인하면서 앱 이미지를 빌드합니다.
