@@ -37,10 +37,18 @@ pipeline {
             }
         }
 
-        stage('Docker Compose Down') {
+        stage('Cleanup Existing Containers') {
             steps {
                 sh '''
-                    docker compose -f docker-compose.yml down --remove-orphans || true
+                    docker rm -f fin-ai-app || true
+                    docker rm -f fin-ai-mongo || true
+                    docker rm -f fin-ai-redis || true
+                    docker rm -f fin-ai-qdrant || true
+                    docker rm -f fin-ai-neo4j || true
+                    docker rm -f fin-ai-dozzle || true
+                    docker rm -f fin-ai-celery-worker || true
+                    docker rm -f fin-ai-celery-beat || true
+                    docker rm -f fin-ai-ingest || true
                 '''
             }
         }
