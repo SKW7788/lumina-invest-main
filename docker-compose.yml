@@ -1,8 +1,8 @@
-# docker compose up -d alone should create the app network and all local data stores.
-# No top-level "version" key is used because Compose V2 treats it as obsolete.
+# docker compose up -d 만으로 앱 네트워크와 로컬 데이터 저장소가 생성됩니다.
+# Compose V2에서는 version 키가 deprecated라서 사용하지 않습니다.
 
 x-app-env: &app-env
-  # The application reads these settings directly from app/config.py.
+  # 애플리케이션은 app/config.py에서 아래 설정을 직접 읽습니다.
   MONGO_URI: mongodb://mongo:27017/fin_ai
   MONGO_DB: fin_ai
   REDIS_URL: redis://redis:6379/0
@@ -19,15 +19,15 @@ x-app-base: &app-base
     context: .
     dockerfile: Dockerfile
   env_file:
-    # Keep local secrets optional so a fresh clone can still start with defaults.
+    # 새로 클론한 환경에서도 기본값으로 실행할 수 있도록 로컬 비밀값 파일은 선택 사항으로 둡니다.
     - path: .env
       required: false
   environment: *app-env
   extra_hosts:
-    # Ollama or other host-only services can still be reached from Linux containers.
+    # Linux 컨테이너에서 Ollama 같은 호스트 전용 서비스에 접근할 수 있게 합니다.
     - host.docker.internal:host-gateway
   volumes:
-    # app_data stores runtime files; ./data is mounted read-only for CSV ingest input.
+    # app_data는 런타임 파일을 저장하고, ./data는 CSV 수집 입력용으로 읽기 전용 마운트합니다.
     - app_data:/app/data
     - ./data:/app/data/csv:ro
   networks:
@@ -44,12 +44,12 @@ x-app-dependencies: &app-dependencies
     condition: service_healthy
 
 x-ingest-dependencies: &ingest-dependencies
-  # The CSV ingest job writes to MongoDB; it does not need the broker to start.
+  # CSV 수집 작업은 MongoDB에만 기록하므로 브로커가 먼저 뜰 필요는 없습니다.
   mongo:
     condition: service_healthy
 
 x-worker-dependencies: &worker-dependencies
-  # Celery tasks touch Redis, MongoDB, Neo4j graph data, and Qdrant RAG indexes.
+  # Celery 작업은 Redis, MongoDB, Neo4j 그래프 데이터, Qdrant RAG 인덱스를 사용합니다.
   mongo:
     condition: service_healthy
   redis:
@@ -60,7 +60,7 @@ x-worker-dependencies: &worker-dependencies
     condition: service_healthy
 
 x-beat-dependencies: &beat-dependencies
-  # Beat only needs Redis available so it can publish scheduled Celery messages.
+  # Beat는 예약된 Celery 메시지를 발행하기 위해 Redis만 준비되면 됩니다.
   redis:
     condition: service_healthy
 
@@ -70,7 +70,7 @@ services:
     container_name: fin-ai-mongo
     restart: unless-stopped
     volumes:
-      # MongoDB keeps application/auth/conversation data, so it must be persistent.
+      # MongoDB는 애플리케이션, 인증, 대화 데이터를 보관하므로 영속 볼륨이 필요합니다.
       - mongo_data:/data/db
     networks:
       - shared-net
@@ -87,7 +87,7 @@ services:
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
-      # Redis is used for sessions and Celery broker/results; AOF keeps them across restarts.
+      # Redis는 세션과 Celery 브로커/결과 저장소로 사용되며, AOF로 재시작 후에도 데이터를 유지합니다.
       - redis_data:/data
     networks:
       - shared-net
@@ -108,7 +108,7 @@ services:
     environment:
       NEO4J_AUTH: neo4j/finagent123
     volumes:
-      # Neo4j graph data is persistent application state.
+      # Neo4j 그래프 데이터는 애플리케이션의 영속 상태입니다.
       - neo4j_data:/data
     networks:
       - shared-net
@@ -127,7 +127,7 @@ services:
       - "6333:6333"
       - "6334:6334"
     volumes:
-      # Qdrant is used by crawl/rag/translation services, so vector indexes need persistence.
+      # Qdrant는 크롤링, RAG, 번역 서비스에서 사용하므로 벡터 인덱스를 영속화합니다.
       - qdrant_data:/qdrant/storage
     networks:
       - shared-net
@@ -137,7 +137,7 @@ services:
       timeout: 5s
       retries: 12
       start_period: 20s
-      
+
   app:
     <<: *app-base
     container_name: fin-ai-app
@@ -155,7 +155,7 @@ services:
   ingest:
     <<: *app-base
     container_name: fin-ai-ingest
-    # This one-shot service loads CSV data after every required datastore is ready.
+    # 필요한 데이터 저장소가 준비된 뒤 CSV 데이터를 적재하는 일회성 서비스입니다.
     entrypoint: ["python", "-m", "app.services.financial_ingest"]
     restart: "no"
     depends_on: *ingest-dependencies
@@ -181,6 +181,20 @@ services:
     restart: unless-stopped
     depends_on: *beat-dependencies
 
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: fin-ai-dozzle
+    ports:
+      - "${DOZZLE_HTTP_PORT:-9999}:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      DOZZLE_LEVEL: info
+      DOZZLE_TAILSIZE: 300
+    networks:
+      - shared-net
+    restart: unless-stopped
+
 volumes:
   mongo_data:
   redis_data:
@@ -190,6 +204,6 @@ volumes:
 
 networks:
   shared-net:
-    # Use the requested shared-net name, but let Compose create it automatically.
+    # shared-net 이름을 고정하되 네트워크 생성은 Compose에 맡깁니다.
     name: shared-net
     driver: bridge

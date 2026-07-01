@@ -1,3 +1,77 @@
+## DevOps Stack
+
+### Local Development
+
+Run the application stack only:
+
+```bash
+docker compose up -d
+```
+
+This starts FastAPI, Celery Worker, Celery Beat, MongoDB, Redis, Neo4j, Qdrant, and Dozzle.
+
+### CI/CD
+
+Run the application stack with the Jenkins stack:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.jenkins.yml up -d
+```
+
+Jenkins is available at `http://localhost:${JENKINS_HTTP_PORT:-8080}`. The Jenkins container uses `shared-net`, the `jenkins_data` volume, the Docker socket, and a project-root mount so pipelines can run `docker compose`.
+
+### Jenkins Production Notes
+
+The Jenkins stack is isolated in `docker-compose.jenkins.yml` and joins the same `shared-net` Docker network as the application stack. This lets the pipeline check `http://fin-ai-app:8000/api/health` without publishing internal service ports.
+
+Jenkins also joins `jenkins-net`, a CI/CD-only bridge network reserved for future Jenkins agents. Keep app containers on `shared-net`; attach Jenkins agents to `jenkins-net` and add `shared-net` only when an agent must reach application services directly.
+
+Jenkins persistent data is stored in the `jenkins_data` named volume. A separate `jenkins_backup` named volume is mounted at `/var/jenkins_backup` so backup jobs or manual exports can be kept away from the live Jenkins home.
+
+Manual backup example:
+
+```bash
+docker run --rm \
+  -v lumina-invest-main_jenkins_data:/var/jenkins_home:ro \
+  -v lumina-invest-main_jenkins_backup:/backup \
+  busybox tar czf /backup/jenkins_home_$(date +%Y%m%d_%H%M%S).tar.gz -C /var/jenkins_home .
+```
+
+The custom Jenkins image installs Docker CLI, Docker Compose Plugin, Blue Ocean, Docker Pipeline, GitHub, Credentials Binding, ANSI Color, Timestamper, Stage View, and Workspace Cleanup plugins.
+
+Pipeline safeguards included:
+
+- 30 minute pipeline timeout
+- build discard policy for old runs and artifacts
+- concurrent deployment prevention
+- timestamped and colorized console output
+- Docker BuildKit and Compose CLI build mode for Docker build cache reuse
+- workspace cleanup after every run
+- GitHub push trigger support
+
+GitHub token credential example:
+
+1. In Jenkins, open `Manage Jenkins` -> `Credentials`.
+2. Add a `Secret text` credential.
+3. Use ID `github-token`.
+4. Use it in future pipeline steps with `withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')])`.
+
+GitHub webhook example:
+
+```text
+Payload URL: http://<jenkins-host>:8080/github-webhook/
+Content type: application/json
+Events: Just the push event
+```
+
+Agent scaling path:
+
+- Port `${JENKINS_AGENT_PORT:-50000}` is exposed for inbound Jenkins agents.
+- Additional agent services can be added to `docker-compose.jenkins.yml` later and attached to `jenkins-net`.
+- Keep app deployment jobs on agents that have Docker socket access or a remote Docker host configured.
+
+---
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
 ## 선수 - https://github.com/edumgt/openstack-private-cloud

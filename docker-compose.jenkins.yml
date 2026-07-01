@@ -1,0 +1,62 @@
+# Jenkins 전용 CI/CD 스택입니다. 앱 배포가 필요할 때 docker-compose.yml과 함께 실행합니다.
+
+services:
+  jenkins:
+    # Docker CLI와 Compose Plugin, 운영용 Jenkins 플러그인이 포함된 커스텀 이미지입니다.
+    build:
+      context: .
+      dockerfile: jenkins.Dockerfile
+    container_name: fin-ai-jenkins
+    restart: unless-stopped
+    # Docker socket 접근과 백업 디렉터리 권한 문제를 피하기 위해 root로 실행합니다.
+    user: root
+    environment:
+      # Jenkins Pipeline에서 호스트 Docker 데몬을 사용하도록 지정합니다.
+      DOCKER_HOST: unix:///var/run/docker.sock
+      JENKINS_HOME: /var/jenkins_home
+      JENKINS_BACKUP_DIR: /var/jenkins_backup
+      # 최초 설정 마법사는 유지하고, 콘솔 ANSI 색상 기본값을 xterm으로 맞춥니다.
+      JAVA_OPTS: >-
+        -Djenkins.install.runSetupWizard=true
+        -Dhudson.plugins.ansicolor.AnsiColorBuildWrapper.colorMapName=xterm
+    ports:
+      - "${JENKINS_HTTP_PORT:-8080}:8080"
+      - "${JENKINS_AGENT_PORT:-50000}:50000"
+    volumes:
+      # Jenkins 설정, Job, 플러그인, credential 메타데이터를 보관합니다.
+      - jenkins_data:/var/jenkins_home
+      # Jenkins 홈 백업 파일을 별도 볼륨에 저장합니다.
+      - jenkins_backup:/var/jenkins_backup
+      # Pipeline에서 docker compose 명령을 실행할 수 있도록 호스트 Docker socket을 연결합니다.
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Jenkins 컨테이너 안에서 프로젝트 루트를 직접 참조할 수 있게 마운트합니다.
+      - ./:/workspace/lumina-invest-main
+    working_dir: /workspace/lumina-invest-main
+    healthcheck:
+      # 로그인 페이지 응답으로 Jenkins 웹 UI 기동 여부를 확인합니다.
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/login >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+    networks:
+      # 앱 컨테이너 이름(fin-ai-app 등)으로 접근하기 위한 공용 앱 네트워크입니다.
+      - shared-net
+      # 향후 Jenkins Agent를 붙이기 위한 Jenkins 전용 네트워크입니다.
+      - jenkins-net
+
+volumes:
+  # Jenkins 운영 데이터 영속 볼륨입니다.
+  jenkins_data:
+  # Jenkins 백업 전용 영속 볼륨입니다.
+  jenkins_backup:
+
+networks:
+  shared-net:
+    external: true
+    # name: shared-net
+    # driver: bridge
+  # CI/CD 구성요소만 붙이는 전용 브리지 네트워크입니다.
+  jenkins-net:
+    name: jenkins-net
+    driver: bridge
