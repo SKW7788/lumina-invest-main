@@ -38,6 +38,22 @@ pipeline {
             }
         }
 
+        stage('Cleanup Existing Containers') {
+            steps {
+                sh '''
+                    docker rm -f fin-ai-app || true
+                    docker rm -f fin-ai-mongo || true
+                    docker rm -f fin-ai-redis || true
+                    docker rm -f fin-ai-qdrant || true
+                    docker rm -f fin-ai-neo4j || true
+                    docker rm -f fin-ai-dozzle || true
+                    docker rm -f fin-ai-celery-worker || true
+                    docker rm -f fin-ai-celery-beat || true
+                    docker rm -f fin-ai-ingest || true
+                '''
+            }
+        }
+
         stage('Docker Build') {
             steps {
                 sh '''
